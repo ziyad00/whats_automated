@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+
+    <title>WhatsApp Automation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            /* Adjust layout */
+        }
+
+        form,
+        .stats-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            margin-bottom: 20px;
+            /* Add space between form and stats */
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        input[type="submit"],
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* Styling for stats display */
+        .stats-container h3 {
+            color: #333;
+            text-align: center;
+        }
+
+        .stats-container p {
+            color: #555;
+            font-size: 16px;
+        }
+
+        .flash-info {
+            color: #31708f;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        /* Style for the screenshot image */
+        #web-screenshot {
+            width: 1000px;
+            /* Adjust the width as needed */
+            height: auto;
+            /* This will maintain the aspect ratio of the image */
+            margin-top: 20px;
+            /* Add some space above the image */
+        }
+    </style>
+</head>
+
+<body>
+    <form action="/send-message" method="post" enctype="multipart/form-data">
+        <h2>Send a Message via WhatsApp</h2>
+        <label for="message">Message:</label><br>
+        <textarea id="message" name="message" rows="4" cols="50"></textarea><br>
+
+        <label for="file">Upload Contacts File:</label><br>
+        <input type="file" id="contacts" name="contacts" required><br>
+
+        <label for="image">Upload Image:</label><br>
+        <input type="file" id="image" name="image"><br>
+
+        <label>Send Order:</label><br>
+        <input type="radio" id="text_first" name="send_order" value="text_first" checked>
+        <label for="text_first">Text First</label><br>
+        <input type="radio" id="image_first" name="send_order" value="image_first">
+        <label for="image_first">Image First</label><br>
+
+        <input type="submit" value="Send Message">
+    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="stats-container">
+        <h3>Statistics:</h3>
+        <p>Messages Sent: <span id="sent_count">0</span></p>
+        <p>Last Number Messaged: <span id="last_number">None</span></p>
+    </div>
+    <div>
+        <h3>Generated QR Code:</h3>
+        <div id="qrcode"></div>
+    </div>
+
+    <script>
+
+        function updateQRCodeData() {
+            fetch('/take-screenshot')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.barcode_data) {
+                        // Empty the QR Code div before generating a new one
+                        document.getElementById('qrcode').innerHTML = "";
+
+                        // Generate and display the QR code using the token
+                        new QRCode(document.getElementById("qrcode"), {
+                            text: data.barcode_data,
+                            width: 256,   // Set the size of the QR code here
+                            height: 256,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                    } else {
+                        console.error('No barcode data found.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        updateQRCodeData(); // Call it to update on page load
+        setInterval(updateQRCodeData, 30000); // Update periodically
+
+        function updateMessageStatus() {
+            fetch('/fetch-message-status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('sent_count').textContent = data.successful_sends;
+                    document.getElementById('last_number').textContent = data.last_successful_contact || 'None';
+                })
+                .catch(error => console.error('Error fetching message status:', error));
+        }
+
+        // Poll every 5 seconds
+        setInterval(updateMessageStatus, 5000);
+    </script>
+</body>
+
+</html>
