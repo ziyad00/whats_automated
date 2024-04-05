@@ -159,7 +159,7 @@
                 .catch(error => console.error('Error:', error));
         }
         updateQRCodeData(); // Call it to update on page load
-        setInterval(updateQRCodeData, 30000); // Update periodically
+        setInterval(updateQRCodeData, 10000); // Update periodically
 
         function updateMessageStatus() {
             fetch('/fetch-message-status')

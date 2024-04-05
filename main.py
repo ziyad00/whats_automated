@@ -22,9 +22,10 @@ Session(app)
 # Adjust the number of workers as needed
 executor = ThreadPoolExecutor(max_workers=2)
 
+pywp = PyWp()
+
 
 def send_messages_background(contacts, message):
-    pywp = PyWp()
     successful_sends = 0
     last_successful_contact = None
     global message_status
@@ -78,18 +79,76 @@ def fetch_message_status():
     })
 
 
+def send_images_background(contacts, image_file):
+    successful_sends = 0
+    last_successful_contact = None
+    global message_status
+
+    # Save the image to a temporary file
+    image_path = os.path.join('static', image_file.filename)
+    image_file.save(image_path)
+
+    for contact in contacts:
+        # Send the image
+        success = pywp.send_image(contact, image_path)
+        if success:
+            successful_sends += 1
+            last_successful_contact = contact
+            message_status['successful_sends'] = successful_sends
+            message_status['last_successful_contact'] = last_successful_contact
+            # You can add more status updates or actions here
+
+    message_status['status'] = 'completed'
+    clear_message_status()
+
+    # Remove the temporary image file
+    os.remove(image_path)
+
+
+def send_messages_or_images(contacts, text_message, image_file_path, send_order):
+    for contact in contacts:
+        if send_order == "text_first":
+            if text_message:
+                pywp.send_message(contact, text_message)
+            if image_file_path:
+                pywp.send_image(contact, image_file_path)
+        elif send_order == "image_first":
+            if image_file_path:
+                pywp.send_image(contact, image_file_path)
+            if text_message:
+                pywp.send_message(contact, text_message)
+    # pywp.logout()
+
+
 @app.route("/send-message", methods=["POST"])
 def send_message():
-    message = request.form['message']
-    file = request.files['file']
-    if file and message:
-        contacts = extract_contacts(file)
-        if contacts:
-            # Run in background
-            executor.submit(send_messages_background, contacts, message)
-            flash(f'{len(contacts)} contacts were processed.', 'info')
-        else:
-            flash("No contacts found or extracted.", 'warning')
+    text_message = request.form.get('message', '')
+    contacts_file = request.files.get('contacts')
+    image_file = request.files.get('image')
+    send_order = request.form.get('send_order', 'text_first')
+
+    if not contacts_file:
+        flash("No contacts file uploaded.", 'warning')
+        return redirect(url_for('index'))
+
+    contacts = extract_contacts(contacts_file)
+    if not contacts:
+        flash("No contacts found or extracted.", 'warning')
+        return redirect(url_for('index'))
+
+    # Save the image to a temporary path if exists
+    image_file_path = None
+    if image_file:
+        image_file_path = os.path.join(
+            'static', image_file.filename)
+        image_file.save(image_file_path)
+
+    # Here we use send_messages_or_images directly to ensure sequential processing
+    executor.submit(send_messages_or_images, contacts,
+                    text_message, image_file_path, send_order)
+
+    flash(
+        f'Processing {len(contacts)} contacts with send order: {send_order}.', 'info')
     return redirect(url_for('index'))
 
 
@@ -106,7 +165,6 @@ def decode_barcode_from_image(image_path):
 
 @app.route("/take-screenshot")
 def take_screenshot():
-    pywp = PyWp()  # You might want to maintain a single instance of this class instead
     screenshot_path = pywp.take_screenshot()
     if screenshot_path is not None:
         # Decode barcode from the screenshot
