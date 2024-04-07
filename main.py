@@ -10,6 +10,7 @@ from PyWp.whats import PyWp  # Ensure this is your modified PyWp class
 from pyzbar.pyzbar import decode
 from PIL import Image
 import os
+
 # from apscheduler.schedulers.background import BackgroundScheduler
 app = Flask(__name__)
 SESSION_TYPE = 'cachelib'

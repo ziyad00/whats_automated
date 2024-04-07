@@ -83,7 +83,7 @@ class PyWp:
         # input("Press Enter once you log in")
 
     def take_screenshot(self):
-        if self.last_screenshot_time and time.time() - self.last_screenshot_time < 15:  # 60 seconds threshold
+        if self.last_screenshot_time and time.time() - self.last_screenshot_time < 7:  # 60 seconds threshold
             return self.screenshot_path
         try:
             has_session = self.driver.execute_script(
