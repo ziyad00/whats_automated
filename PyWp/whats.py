@@ -82,9 +82,7 @@ class PyWp:
         # time.sleep(3)
         # input("Press Enter once you log in")
 
-    def take_screenshot(self):
-        if self.last_screenshot_time and time.time() - self.last_screenshot_time < 7:  # 60 seconds threshold
-            return self.screenshot_path
+    def take_screenshot_task(self):
         try:
             has_session = self.driver.execute_script(
                 "return window.localStorage.getItem('WaInitialHistorySynced') !== null;")
@@ -93,6 +91,36 @@ class PyWp:
                 "Encountered a script timeout. Proceeding with taking a screenshot regardless.")
             has_session = True  # Assuming no session or unable to determine
 
+        if has_session is True:
+            return True
+        if not has_session:
+            # time.sleep(6)  # Adjust this wait time as needed
+            # Navigate up one level from the current script location, then into the 'static' directory
+            screenshot_path = os.path.join(os.path.dirname(
+                os.path.abspath(__file__)), '..', 'static', 'screenshot.png')
+
+            # Normalize the path to resolve any '..' and similar path elements
+            normalized_screenshot_path = os.path.normpath(screenshot_path)
+
+            # Save the screenshot
+            self.driver.save_screenshot(normalized_screenshot_path)
+
+            # Return the relative path from the Flask app root, to be used in URL generation
+            return self.screenshot_path
+        else:
+            return None
+
+    def take_screenshot(self):
+
+        try:
+            has_session = self.driver.execute_script(
+                "return window.localStorage.getItem('WaInitialHistorySynced') !== null;")
+        except:
+            print(
+                "Encountered a script timeout. Proceeding with taking a screenshot regardless.")
+            has_session = True  # Assuming no session or unable to determine
+        if True:  # 60 seconds threshold
+            return self.screenshot_path
         if has_session is True:
             return True
         if not has_session:

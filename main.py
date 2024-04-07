@@ -11,7 +11,7 @@ from pyzbar.pyzbar import decode
 from PIL import Image
 import os
 
-# from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 app = Flask(__name__)
 SESSION_TYPE = 'cachelib'
 SESSION_SERIALIZATION_FORMAT = 'json'
@@ -224,9 +224,13 @@ def extract_contacts(file):
         return []
 
 
+def screenshot_task():
+    pywp.take_screenshot_task()
+
+
 if __name__ == "__main__":
-    # scheduler = BackgroundScheduler()
+    scheduler = BackgroundScheduler()
     # Adjust the interval as needed
-    # scheduler.add_job(screenshot_task, 'interval', seconds=30)
-    # scheduler.start()
+    scheduler.add_job(screenshot_task, 'interval', seconds=5)
+    scheduler.start()
     app.run(debug=True)
