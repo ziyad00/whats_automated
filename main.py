@@ -22,7 +22,7 @@ def screenshot_task():
     pywp.take_screenshot_task()
 
 
-scheduler.add_job(screenshot_task, 'interval', seconds=2)
+scheduler.add_job(screenshot_task, 'interval', seconds=5)
 scheduler.start()
 SESSION_TYPE = 'cachelib'
 SESSION_SERIALIZATION_FORMAT = 'json'
