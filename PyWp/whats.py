@@ -34,9 +34,9 @@ class PyWp:
         # Overcome limited resource problems
         self.options.add_argument("--disable-dev-shm-usage")
         self.options.binary_location = "/usr/bin/google-chrome"
-        self.driver.implicitly_wait(10)  # Implicit wait, adjust as necessary
+        self.options.implicitly_wait(10)  # Implicit wait, adjust as necessary
         # Increase script timeout to 30 seconds
-        self.driver.set_script_timeout(30)
+        self.options.set_script_timeout(30)
 
         # print(profile_path, profile_name)
         if profile_path is not None and profile_name is not None:
