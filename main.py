@@ -6,7 +6,7 @@ from flask import jsonify
 import time
 from io import BytesIO
 from concurrent.futures import ThreadPoolExecutor
-from PyWp.whats import PyWp  # Ensure this is your modified PyWp class
+from PyWp3.whats import PyWp  # Ensure this is your modified PyWp class
 from pyzbar.pyzbar import decode
 from PIL import Image
 import os
