@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Automation</title>
+    <style>
+        :root {
+            --whatsapp-dark-green: #075E54;
+            --whatsapp-light-green: #25D366;
+            --whatsapp-background: #EDEDED;
+            --whatsapp-text: #4A4A4A;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: var(--whatsapp-background);
+            color: var(--whatsapp-text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form,
+        .stats-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: calc(100% - 40px);
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+
+        h2,
+        h3 {
+            text-align: center;
+            color: var(--whatsapp-dark-green);
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            color: var(--whatsapp-text);
+        }
+
+        input[type="text"],
+        input[type="file"],
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #CCC;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--whatsapp-light-green);
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        input[type="submit"]:hover {
+            background-color: darken(var(--whatsapp-light-green), 10%);
+        }
+
+        .flash-info {
+            background-color: #DCF8C6;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        #qrcode {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #CCC;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h3>Generated QR Code:</h3>
+        <div id="qrcode"></div>
+
+    </div>
+
+    <script>
+        function updateQRCodeData() {
+            fetch('/take-screenshot')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.logged_in) {
+                        // User is logged in, redirect to the main page
+                        window.location.href = "/";
+                    } else if (data.barcode_data) {
+                        // Empty the QR Code div before generating a new one
+                        document.getElementById('qrcode').innerHTML = "";
+
+                        // Generate and display the QR code using the token
+                        new QRCode(document.getElementById("qrcode"), {
+                            text: data.barcode_data,
+                            width: 256,   // Set the size of the QR code here
+                            height: 256,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                    } else {
+                        console.error('No barcode data found.');
+                        document.getElementById('qrcode').innerHTML = "waiting to get QR Code";
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        updateQRCodeData(); // Call it to update on page load
+        setInterval(updateQRCodeData, 3000); // Update periodically</script>
+
+</body>
+
+</html>

@@ -58,7 +58,7 @@ def login():
         password = request.form['password']
         if username == 'admin' and password == '1234':
             session['logged_in'] = True
-            return redirect(url_for('index'))
+            return redirect(url_for('qr_code'))
         else:
             flash('Invalid Credentials. Please try again.', 'danger')
     return render_template('login.html')
@@ -77,6 +77,13 @@ def fetch_message_status():
         'successful_sends': message_status.get('successful_sends', 0),
         'last_successful_contact': message_status.get('last_successful_contact', 'None')
     })
+
+
+@app.route('/qr-code', methods=['GET'])
+def qr_code():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template('qrcode.html')
 
 
 def send_images_background(contacts, image_file):
@@ -105,19 +112,24 @@ def send_images_background(contacts, image_file):
     os.remove(image_path)
 
 
-def send_messages_or_images(contacts, text_message, image_file_path, send_order):
-    for contact in contacts:
+def send_messages_or_images(contacts, text_message, image_file_path, send_order, greeting="", add_greeting=False):
+    for name, contact in contacts:
+        final_message = text_message
+        # Check if greeting is to be added and prepend it with the name
+        if add_greeting and greeting:
+            personalized_greeting = f"{greeting}, {name}:  \n\n"
+            final_message = personalized_greeting + final_message
+
         if send_order == "text_first":
-            if text_message:
-                pywp.send_message(contact, text_message)
+            if final_message:
+                pywp.send_message(contact, final_message)
             if image_file_path:
                 pywp.send_image(contact, image_file_path)
         elif send_order == "image_first":
             if image_file_path:
                 pywp.send_image(contact, image_file_path)
-            if text_message:
-                pywp.send_message(contact, text_message)
-    # pywp.logout()
+            if final_message:
+                pywp.send_message(contact, final_message)
 
 
 @app.route("/send-message", methods=["POST"])
@@ -126,6 +138,9 @@ def send_message():
     contacts_file = request.files.get('contacts')
     image_file = request.files.get('image')
     send_order = request.form.get('send_order', 'text_first')
+
+    greeting_message = request.form.get('greeting_message', '')
+    add_greeting = 'add_greeting' in request.form
 
     if not contacts_file:
         flash("No contacts file uploaded.", 'warning')
@@ -136,16 +151,14 @@ def send_message():
         flash("No contacts found or extracted.", 'warning')
         return redirect(url_for('index'))
 
-    # Save the image to a temporary path if exists
     image_file_path = None
     if image_file:
-        image_file_path = os.path.join(
-            'static', image_file.filename)
+        image_file_path = os.path.join('static', image_file.filename)
         image_file.save(image_file_path)
 
-    # Here we use send_messages_or_images directly to ensure sequential processing
-    executor.submit(send_messages_or_images, contacts,
-                    text_message, image_file_path, send_order)
+    # Directly use send_messages_or_images to ensure sequential processing
+    executor.submit(send_messages_or_images, contacts, text_message,
+                    image_file_path, send_order, greeting_message, add_greeting)
 
     flash(
         f'Processing {len(contacts)} contacts with send order: {send_order}.', 'info')
@@ -166,31 +179,38 @@ def decode_barcode_from_image(image_path):
 @app.route("/take-screenshot")
 def take_screenshot():
     screenshot_path = pywp.take_screenshot()
-    if screenshot_path is not None:
-        # Decode barcode from the screenshot
-        barcode_data = decode_barcode_from_image(
-            os.path.join('static', screenshot_path))
-        # Check if a barcode was found
-        if barcode_data:
-            # Return barcode data with the response
-            return jsonify({
-                'screenshot_path': url_for('static', filename=screenshot_path, _external=True) + f"?{int(time.time())}",
-                'barcode_data': barcode_data
-            })
+    if screenshot_path:
+        if screenshot_path == True:
+            # Return indicating the user is already logged in
+            return jsonify({'logged_in': True})
+        else:
+            # Decode barcode from the screenshot
+            barcode_data = decode_barcode_from_image(
+                os.path.join('static', screenshot_path))
+            if barcode_data:
+                return jsonify({
+                    'screenshot_path': url_for('static', filename=screenshot_path, _external=True) + f"?{int(time.time())}",
+                    'barcode_data': barcode_data
+                })
+            else:
+                return jsonify({'error': 'No barcode found in the screenshot.'})
     else:
-        return jsonify({'error': 'No barcode found in the screenshot.'})
+        # Handle case where no screenshot path is provided (no session found)
+        return jsonify({'error': 'Session not found or not logged in.'})
 
 
 def extract_contacts(file):
     try:
-        workbook = openpyxl.load_workbook(filename=BytesIO(file.read()))
+        workbook = openpyxl.load_workbook(
+            filename=BytesIO(file.read()), data_only=True)
         sheet = workbook.active
         contacts = []
         for row in sheet.iter_rows(min_row=2, values_only=True):
-            # Assuming phone numbers are in the second column
+            # Assuming names are in the first column and phone numbers in the second
+            name = row[0]
             phone_number = row[1]
-            if phone_number:
-                contacts.append(str(phone_number))
+            if name and phone_number:
+                contacts.append((name.strip(), str(phone_number).strip()))
         return contacts
     except Exception as e:
         print(f"Failed to process file: {e}")

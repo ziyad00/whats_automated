@@ -98,21 +98,27 @@
 
 <body>
     <form action="/send-message" method="post" enctype="multipart/form-data">
+
         <h2>Send a Message via WhatsApp</h2>
+        <label for="add_greeting">Add Greeting</label>
+        <input type="checkbox" id="add_greeting" name="add_greeting" onchange="toggleGreetingField()">
+        <label for="greeting_message" style="display:none">Greeting Message:</label>
+        <input type="text" id="greeting_message" name="greeting_message" style="display:none">
+        <br>
         <label for="message">Message:</label><br>
         <textarea id="message" name="message" rows="4" cols="50"></textarea><br>
-
-        <label for="file">Upload Contacts File:</label><br>
-        <input type="file" id="contacts" name="contacts" required><br>
-
         <label for="image">Upload Image:</label><br>
         <input type="file" id="image" name="image"><br>
+
+
 
         <label>Send Order:</label><br>
         <input type="radio" id="text_first" name="send_order" value="text_first" checked>
         <label for="text_first">Text First</label><br>
         <input type="radio" id="image_first" name="send_order" value="image_first">
-        <label for="image_first">Image First</label><br>
+        <label for="image_first">Image First</label><br><br>
+        <label for="file">Upload Contacts File:</label><br>
+        <input type="file" id="contacts" name="contacts" required><br>
 
         <input type="submit" value="Send Message">
     </form>
@@ -128,38 +134,11 @@
         <p>Messages Sent: <span id="sent_count">0</span></p>
         <p>Last Number Messaged: <span id="last_number">None</span></p>
     </div>
-    <div>
-        <h3>Generated QR Code:</h3>
-        <div id="qrcode"></div>
-    </div>
+
 
     <script>
 
-        function updateQRCodeData() {
-            fetch('/take-screenshot')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.barcode_data) {
-                        // Empty the QR Code div before generating a new one
-                        document.getElementById('qrcode').innerHTML = "";
 
-                        // Generate and display the QR code using the token
-                        new QRCode(document.getElementById("qrcode"), {
-                            text: data.barcode_data,
-                            width: 256,   // Set the size of the QR code here
-                            height: 256,
-                            colorDark: "#000000",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.H
-                        });
-                    } else {
-                        console.error('No barcode data found.');
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
-        updateQRCodeData(); // Call it to update on page load
-        setInterval(updateQRCodeData, 10000); // Update periodically
 
         function updateMessageStatus() {
             fetch('/fetch-message-status')
@@ -170,9 +149,37 @@
                 })
                 .catch(error => console.error('Error fetching message status:', error));
         }
+        function toggleGreetingField() {
+            var checkBox = document.getElementById("add_greeting");
+            var greetingLabel = document.querySelector('label[for="greeting_message"]');
+            var greetingInput = document.getElementById("greeting_message");
+            if (checkBox.checked == true) {
+                greetingLabel.style.display = "block";
+                greetingInput.style.display = "block";
+            } else {
+                greetingLabel.style.display = "none";
+                greetingInput.style.display = "none";
+            }
+        }
+
 
         // Poll every 5 seconds
         setInterval(updateMessageStatus, 5000);
+
+        function updateQRCodeData() {
+            fetch('/take-screenshot')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.logged_in) {
+                        // User is logged in, redirect to the main page
+                        window.location.href = "/qr-code";
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        updateQRCodeData(); // Call it to update on page load
+        setInterval(updateQRCodeData, 3000); // Update periodically</script>
+
     </script>
 </body>
 
