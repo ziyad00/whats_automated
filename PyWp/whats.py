@@ -34,6 +34,9 @@ class PyWp:
         # Overcome limited resource problems
         self.options.add_argument("--disable-dev-shm-usage")
         self.options.binary_location = "/usr/bin/google-chrome"
+        self.driver.implicitly_wait(10)  # Implicit wait, adjust as necessary
+        # Increase script timeout to 30 seconds
+        self.driver.set_script_timeout(30)
 
         # print(profile_path, profile_name)
         if profile_path is not None and profile_name is not None:
@@ -47,6 +50,22 @@ class PyWp:
             # specify where your chrome driver present in your pc
 
         self.open_browser()
+
+    def open_browser(self, path="https://web.whatsapp.com/"):
+        # Only open a new browser if there isn't one already
+        if not self.driver:
+            self.driver = webdriver.Chrome(options=self.options)
+            self.driver.get(path)
+        else:
+            # If browser exists, just navigate to the desired URL if not already there
+            if self.driver.current_url != path:
+                self.driver.get(path)
+
+    def close_browser(self):
+        # Close the browser and set driver to None
+        if self.driver:
+            self.driver.quit()
+            self.driver = None
 
     def extract_data_ref(self):
         xpath_selector = "//*[contains(text(), 'Link with phone number instead.')]/ancestor::div[@data-ref]"
