@@ -29,6 +29,10 @@ class PyWp:
         # self.options.add_experimental_option("prefs", prefs)
         # self.options.add_experimental_option(
         #     "debuggerAddress", "localhost:9222")
+        self.options.add_argument("--no-sandbox")  # Bypass OS security model
+        self.options.add_argument("--headless")  # Run headless
+        # Overcome limited resource problems
+        self.options.add_argument("--disable-dev-shm-usage")
 
         # print(profile_path, profile_name)
         if profile_path is not None and profile_name is not None:
