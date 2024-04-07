@@ -90,7 +90,6 @@ class PyWp:
             print(
                 "Encountered a script timeout. Proceeding with taking a screenshot regardless.")
             has_session = True  # Assuming no session or unable to determine
-
         if has_session is True:
             return True
         if not has_session:
@@ -119,8 +118,7 @@ class PyWp:
             print(
                 "Encountered a script timeout. Proceeding with taking a screenshot regardless.")
             has_session = True  # Assuming no session or unable to determine
-        if True:  # 60 seconds threshold
-            return self.screenshot_path
+
         if has_session is True:
             return True
         if not has_session:
@@ -137,7 +135,7 @@ class PyWp:
             self.last_screenshot_time = time.time()  # Update the timestamp
 
             # Return the relative path from the Flask app root, to be used in URL generation
-            return self.screenshot_path
+            return "screenshot.png"
         else:
             return None
 

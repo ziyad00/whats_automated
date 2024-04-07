@@ -13,6 +13,17 @@ import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
 app = Flask(__name__)
+scheduler = BackgroundScheduler()
+
+pywp = PyWp()
+
+
+def screenshot_task():
+    pywp.take_screenshot_task()
+
+
+scheduler.add_job(screenshot_task, 'interval', seconds=2)
+scheduler.start()
 SESSION_TYPE = 'cachelib'
 SESSION_SERIALIZATION_FORMAT = 'json'
 SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir="sessions"),
@@ -23,8 +34,6 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 # Adjust the number of workers as needed
 executor = ThreadPoolExecutor(max_workers=2)
-
-pywp = PyWp()
 
 
 def send_messages_background(contacts, message):
@@ -224,13 +233,8 @@ def extract_contacts(file):
         return []
 
 
-def screenshot_task():
-    pywp.take_screenshot_task()
-
-
 if __name__ == "__main__":
-    scheduler = BackgroundScheduler()
     # Adjust the interval as needed
-    scheduler.add_job(screenshot_task, 'interval', seconds=5)
+
     scheduler.start()
     app.run(debug=True)
