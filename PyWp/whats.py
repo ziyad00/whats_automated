@@ -88,8 +88,6 @@ class PyWp:
                 "Encountered a script timeout. Proceeding with taking a screenshot regardless.")
             has_session = True  # Assuming no session or unable to determine
 
-        has_session = self.driver.execute_script(
-            "return window.localStorage.getItem('WaInitialHistorySynced') !== null;")
         if has_session is True:
             return True
         if not has_session:
