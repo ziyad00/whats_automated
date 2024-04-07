@@ -24,6 +24,9 @@ class PyWp:
         # options.add_argument('--no-sandbox')
         # options.add_argument('--headless')
         # options.add_argument('--disable-dev-shm-usage')
+        self.last_screenshot_time = None
+        self.screenshot_path = os.path.join(os.path.dirname(
+            os.path.abspath(__file__)), '..', 'static', 'screenshot.png')
 
         # prefs = {"profile.default_content_setting_values.media_stream_camera": 1}
         # self.options.add_experimental_option("prefs", prefs)
@@ -80,6 +83,8 @@ class PyWp:
         # input("Press Enter once you log in")
 
     def take_screenshot(self):
+        if self.last_screenshot_time and time.time() - self.last_screenshot_time < 15:  # 60 seconds threshold
+            return self.screenshot_path
         try:
             has_session = self.driver.execute_script(
                 "return window.localStorage.getItem('WaInitialHistorySynced') !== null;")
@@ -101,9 +106,10 @@ class PyWp:
 
             # Save the screenshot
             self.driver.save_screenshot(normalized_screenshot_path)
+            self.last_screenshot_time = time.time()  # Update the timestamp
 
             # Return the relative path from the Flask app root, to be used in URL generation
-            return 'screenshot.png'
+            return self.screenshot_path
         else:
             return None
 

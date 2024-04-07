@@ -10,6 +10,7 @@ from PyWp.whats import PyWp  # Ensure this is your modified PyWp class
 from pyzbar.pyzbar import decode
 from PIL import Image
 import os
+# from apscheduler.schedulers.background import BackgroundScheduler
 app = Flask(__name__)
 SESSION_TYPE = 'cachelib'
 SESSION_SERIALIZATION_FORMAT = 'json'
@@ -165,6 +166,11 @@ def send_message():
     return redirect(url_for('index'))
 
 
+def take_screenshot_periodically():
+    # Your screenshot logic here
+    pywp.take_screenshot()
+
+
 def decode_barcode_from_image(image_path):
     # Load the image
     image = Image.open(image_path)
@@ -218,4 +224,8 @@ def extract_contacts(file):
 
 
 if __name__ == "__main__":
+    # scheduler = BackgroundScheduler()
+    # Adjust the interval as needed
+    # scheduler.add_job(screenshot_task, 'interval', seconds=30)
+    # scheduler.start()
     app.run(debug=True)
