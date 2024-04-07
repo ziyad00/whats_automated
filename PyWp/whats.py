@@ -80,6 +80,14 @@ class PyWp:
         # input("Press Enter once you log in")
 
     def take_screenshot(self):
+        try:
+            has_session = self.driver.execute_script(
+                "return window.localStorage.getItem('WaInitialHistorySynced') !== null;")
+        except:
+            print(
+                "Encountered a script timeout. Proceeding with taking a screenshot regardless.")
+            has_session = True  # Assuming no session or unable to determine
+
         has_session = self.driver.execute_script(
             "return window.localStorage.getItem('WaInitialHistorySynced') !== null;")
         if has_session is True:
