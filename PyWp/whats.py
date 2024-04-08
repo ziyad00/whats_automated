@@ -189,7 +189,7 @@ class PyWp:
 
         pyperclip.copy(os.path.abspath(path))
         message_path = f'//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]'
-        message_element = WebDriverWait(self.driver, 15).until(
+        message_element = WebDriverWait(self.driver, 40).until(
             EC.presence_of_element_located((By.XPATH, message_path)))
 
         message_element.send_keys(Keys.CONTROL, 'v')
@@ -214,7 +214,7 @@ class PyWp:
         self.select_contact(phone_no, message)
         try:
             message_path = f'//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]'
-            message_element = WebDriverWait(self.driver, 15).until(
+            message_element = WebDriverWait(self.driver, 40).until(
                 EC.presence_of_element_located((By.XPATH, message_path)))
 
             message_element.send_keys(Keys.ENTER)
