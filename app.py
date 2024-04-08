@@ -22,9 +22,10 @@ def screenshot_task():
     pywp.take_screenshot_task()
 
 
-scheduler.add_job(screenshot_task, 'interval', seconds=10)
 if not scheduler.running:
     scheduler.start()
+    scheduler.add_job(screenshot_task, 'interval', seconds=10)
+
 
 SESSION_TYPE = 'cachelib'
 SESSION_SERIALIZATION_FORMAT = 'json'
@@ -98,6 +99,7 @@ def qr_code():
         return redirect(url_for('login'))
     return render_template('qrcode.html')
 
+
 @app.route("/logout", methods=["GET"])
 def logout():
     try:
@@ -106,6 +108,7 @@ def logout():
     except Exception as e:
         flash(f"Error during logout: {e}", "danger")
     return redirect(url_for("index"))
+
 
 def send_images_background(contacts, image_file):
     successful_sends = 0
