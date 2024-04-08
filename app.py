@@ -101,7 +101,8 @@ def qr_code():
 def logout():
     try:
         pywp.logout_whatsapp()
-        scheduler.start()
+        if not scheduler.running:
+            scheduler.start()
         flash("Successfully logged out from WhatsApp Web.", "info")
     except Exception as e:
         flash(f"Error during logout: {e}", "danger")
