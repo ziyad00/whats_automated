@@ -211,11 +211,15 @@ class PyWp:
             #     print(f"Not able to initiate chat with {phone_no}: {e}")
 
     def send_message(self, phone_no: str, message: str):
+        print("start sending")
         self.select_contact(phone_no, message)
+        print("start select")
+
         try:
             message_path = f'//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]'
             message_element = WebDriverWait(self.driver, 70).until(
                 EC.presence_of_element_located((By.XPATH, message_path)))
+            print("finish waiting")
 
             message_element.send_keys(Keys.ENTER)
             # time.sleep(3)
