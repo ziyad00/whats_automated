@@ -166,19 +166,19 @@
         // Poll every 5 seconds
         // setInterval(updateMessageStatus, 5000);
 
-        function updateQRCodeData() {
-            fetch('/take-screenshot')
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.logged_in) {
-                        // User is logged in, redirect to the main page
-                        window.location.href = "/qr-code";
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
-        // updateQRCodeData(); // Call it to update on page load
-        setInterval(updateQRCodeData, 5000); // Update periodically</script>
+        // function updateQRCodeData() {
+        //     fetch('/take-screenshot')
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (!data.logged_in) {
+        //                 // User is logged in, redirect to the main page
+        //                 window.location.href = "/qr-code";
+        //             }
+        //         })
+        //         .catch(error => console.error('Error:', error));
+        // }
+        // // updateQRCodeData(); // Call it to update on page load
+        // setInterval(updateQRCodeData, 5000); // Update periodically</script>
 
     </script>
 </body>

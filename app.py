@@ -22,7 +22,7 @@ def screenshot_task():
     pywp.take_screenshot_task()
 
 
-scheduler.add_job(screenshot_task, 'interval', seconds=20)
+scheduler.add_job(screenshot_task, 'interval', seconds=10)
 if not scheduler.running:
     scheduler.start()
 

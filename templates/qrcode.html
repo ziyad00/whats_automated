@@ -134,7 +134,7 @@
                 .catch(error => console.error('Error:', error));
         }
         updateQRCodeData(); // Call it to update on page load
-        setInterval(updateQRCodeData, 5000); // Update periodically
+        setInterval(updateQRCodeData, 10000); // Update periodically
         document.getElementById("loginSuccess").addEventListener("click", function () {
             window.location.href = "/"; // Redirect to the main page
         });
