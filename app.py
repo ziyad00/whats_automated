@@ -141,7 +141,7 @@ def send_messages_or_images(contacts, text_message, image_file_path, send_order,
         final_message = text_message
         # Check if greeting is to be added and prepend it with the name
         if add_greeting and greeting:
-            personalized_greeting = f"{greeting}, {name}:  \n\n"
+            personalized_greeting = f"{greeting} {name},  \n\n"
             final_message = personalized_greeting + final_message
 
         if send_order == "text_first":
@@ -234,7 +234,7 @@ def extract_contacts(file):
             filename=BytesIO(file.read()), data_only=True)
         sheet = workbook.active
         contacts = []
-        for row in sheet.iter_rows(min_row=2, values_only=True):
+        for row in sheet.iter_rows(min_row=1, values_only=True):
             # Assuming names are in the first column and phone numbers in the second
             name = row[0]
             phone_number = row[1]
