@@ -106,7 +106,7 @@ def logout():
     except Exception as e:
         flash(f"Error during logout: {e}", "danger")
 
-    return redirect(url_for("index"))
+    return redirect(url_for("qr_code"))
 
 
 def send_images_background(contacts, image_file):
