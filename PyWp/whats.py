@@ -96,7 +96,8 @@ class PyWp:
         if has_session is True:
             return True
         if not has_session:
-            if self.last_screenshot_time and time.time() - self.last_screenshot_time < 60:  # 60 seconds threshold
+            x = time.time()
+            if self.last_screenshot_time and time.time() - self.last_screenshot_time > 60:  # 60 seconds threshold
                 self.driver.refresh()
 
             # time.sleep(6)  # Adjust this wait time as needed
