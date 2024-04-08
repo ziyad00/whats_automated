@@ -19,12 +19,9 @@ pywp = PyWp()
 
 
 def screenshot_task():
-    pywp.take_screenshot_task()
-
-
-if not scheduler.running:
-    scheduler.start()
-    scheduler.add_job(screenshot_task, 'interval', seconds=10)
+    result = pywp.take_screenshot_task()
+    if result is True:
+        scheduler.shutdown()
 
 
 SESSION_TYPE = 'cachelib'
@@ -104,9 +101,11 @@ def qr_code():
 def logout():
     try:
         pywp.logout_whatsapp()
+        scheduler.start()
         flash("Successfully logged out from WhatsApp Web.", "info")
     except Exception as e:
         flash(f"Error during logout: {e}", "danger")
+
     return redirect(url_for("index"))
 
 
@@ -248,5 +247,7 @@ def extract_contacts(file):
 
 if __name__ == "__main__":
     # Adjust the interval as needed
-
+    if not scheduler.running:
+        scheduler.start()
+        scheduler.add_job(screenshot_task, 'interval', seconds=10)
     app.run(debug=True, host='0.0.0.0')
