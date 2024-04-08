@@ -126,6 +126,9 @@ class PyWp:
             self.driver.execute_script(
                 "window.localStorage.removeItem('WANoiseInfo');")
 
+            self.driver.execute_script(
+                "window.localStorage.removeItem('WaInitialHistorySynced');")
+
             # Optionally, refresh the page to see the effect immediately
             self.driver.refresh()
 
