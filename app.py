@@ -98,6 +98,14 @@ def qr_code():
         return redirect(url_for('login'))
     return render_template('qrcode.html')
 
+@app.route("/logout", methods=["GET"])
+def logout():
+    try:
+        pywp.logout_whatsapp()
+        flash("Successfully logged out from WhatsApp Web.", "info")
+    except Exception as e:
+        flash(f"Error during logout: {e}", "danger")
+    return redirect(url_for("index"))
 
 def send_images_background(contacts, image_file):
     successful_sends = 0

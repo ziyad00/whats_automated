@@ -20,6 +20,7 @@ class PyWp:
 
         # create chromeoptions instance
         self.options = webdriver.ChromeOptions()
+        self.last_screenshot_time = None  # Update the timestamp
 
         # options.add_argument('--no-sandbox')
         # options.add_argument('--headless')
@@ -84,6 +85,7 @@ class PyWp:
         # input("Press Enter once you log in")
 
     def take_screenshot_task(self):
+
         try:
             has_session = self.driver.execute_script(
                 "return window.localStorage.getItem('WaInitialHistorySynced') !== null;")
@@ -94,6 +96,9 @@ class PyWp:
         if has_session is True:
             return True
         if not has_session:
+            if self.last_screenshot_time and time.time() - self.last_screenshot_time < 60:  # 60 seconds threshold
+                self.driver.refresh()
+
             # time.sleep(6)  # Adjust this wait time as needed
             # Navigate up one level from the current script location, then into the 'static' directory
             screenshot_path = os.path.join(os.path.dirname(
@@ -104,11 +109,27 @@ class PyWp:
 
             # Save the screenshot
             self.driver.save_screenshot(normalized_screenshot_path)
+            self.last_screenshot_time = time.time()  # Update the timestamp
 
             # Return the relative path from the Flask app root, to be used in URL generation
             return self.screenshot_path
         else:
             return None
+
+    def logout_whatsapp(self):
+        try:
+            # Navigate to WhatsApp Web
+            # self.driver.get('https://web.whatsapp.com/')
+            # time.sleep(10)  # Adjust timing based on your connection speed
+            # Execute JavaScript to remove the 'WaInitialHistorySynced' item from local storage
+            self.driver.execute_script(
+                "window.localStorage.removeItem('WANoiseInfo');")
+
+            # Optionally, refresh the page to see the effect immediately
+            self.driver.refresh()
+
+        except Exception as e:
+            print(f"Error deleting session 'WaInitialHistorySynced': {e}")
 
     def take_screenshot(self):
 

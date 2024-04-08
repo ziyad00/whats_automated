@@ -3,6 +3,7 @@
 
 <head>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>WhatsApp Automation</title>
     <style>
@@ -10,13 +11,15 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            /* Added padding around the entire body to prevent cut-off */
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
+            /* Changed from center to flex-start to prevent cut-off at the top */
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            /* Changed from height to min-height */
             flex-direction: column;
-            /* Adjust layout */
         }
 
         form,
@@ -29,6 +32,50 @@
             width: 100%;
             margin-bottom: 20px;
             /* Add space between form and stats */
+        }
+
+        @media screen and (max-width: 600px) {
+
+            form,
+            .stats-container {
+                max-width: 100%;
+                margin: 10px;
+                box-shadow: none;
+            }
+
+            /* Adjust the font size for smaller screens */
+            h2,
+            .stats-container h3,
+            label,
+            .stats-container p {
+                font-size: 14px;
+            }
+
+            /* Adjust input and textarea sizes */
+            input[type="text"],
+            input[type="file"],
+            input[type="submit"],
+            textarea {
+                width: calc(100% - 20px);
+            }
+
+            /* Style adjustments for mobile */
+            body {
+                justify-content: flex-start;
+                /* Ensure content starts from the top */
+                padding: 10px;
+                /* Adjust padding for smaller screens */
+            }
+
+            form,
+            .stats-container {
+                max-width: 100%;
+                margin: 10px 0;
+                /* Adjust margin to add space on top and bottom */
+                padding: 15px;
+                /* Increased padding for better spacing */
+                box-shadow: none;
+            }
         }
 
         h2 {
@@ -117,10 +164,15 @@
         <label for="text_first">Text First</label><br>
         <input type="radio" id="image_first" name="send_order" value="image_first">
         <label for="image_first">Image First</label><br><br>
-        <label for="file">Upload Contacts File:</label><br>
+        <label for="file">Upload Contacts File<br> [first column names, second column
+            numbers]:</label><br>
         <input type="file" id="contacts" name="contacts" required><br>
 
         <input type="submit" value="Send Message">
+
+    </form>
+    <form action="/logout" method="get" style="text-align:center;">
+        <input type="submit" value="Logout from WhatsApp Web">
     </form>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
