@@ -35,8 +35,9 @@ class PyWp:
         self.options.add_argument("--no-sandbox")  # Bypass OS security model
         # self.options.add_argument("--headless")  # Run headless
         # Overcome limited resource problems
-        self.options.add_argument("--disable-dev-shm-usage")
-        self.options.binary_location = "/usr/bin/google-chrome"
+        # self.options.add_argument("--disable-dev-shm-usage")
+        # self.options.binary_location = "/usr/bin/google-chrome"
+        # options.binary_location = "/usr/bin/chromium-browser"  # Path to Chromium executable
 
         # print(profile_path, profile_name)
         if profile_path is not None and profile_name is not None:

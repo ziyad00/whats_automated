@@ -23,7 +23,9 @@ def screenshot_task():
 
 
 scheduler.add_job(screenshot_task, 'interval', seconds=20)
-scheduler.start()
+if not scheduler.running:
+    scheduler.start()
+
 SESSION_TYPE = 'cachelib'
 SESSION_SERIALIZATION_FORMAT = 'json'
 SESSION_CACHELIB = FileSystemCache(threshold=500, cache_dir="sessions"),
@@ -236,5 +238,4 @@ def extract_contacts(file):
 if __name__ == "__main__":
     # Adjust the interval as needed
 
-    scheduler.start()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
