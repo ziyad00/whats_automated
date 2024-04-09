@@ -148,7 +148,6 @@ class PyWp:
         if has_session is True:
             return True
         if not has_session:
-            # time.sleep(6)  # Adjust this wait time as needed
             # Navigate up one level from the current script location, then into the 'static' directory
             screenshot_path = os.path.join(os.path.dirname(
                 os.path.abspath(__file__)), '..', 'static', 'screenshot.png')

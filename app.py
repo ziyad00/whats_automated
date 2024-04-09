@@ -13,15 +13,15 @@ import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
 app = Flask(__name__)
-scheduler = BackgroundScheduler()
+# scheduler = BackgroundScheduler()
 
 pywp = PyWp()
 
 
-def screenshot_task():
-    result = pywp.take_screenshot_task()
-    if result is True:
-        scheduler.shutdown()
+# def screenshot_task():
+#     result = pywp.take_screenshot_task()
+#     if result is True:
+#         scheduler.shutdown()
 
 
 SESSION_TYPE = 'cachelib'
@@ -248,7 +248,7 @@ def extract_contacts(file):
 
 if __name__ == "__main__":
     # Adjust the interval as needed
-    if not scheduler.running:
-        scheduler.start()
-        scheduler.add_job(screenshot_task, 'interval', seconds=10)
+    # if not scheduler.running:
+    #     scheduler.start()
+    #     scheduler.add_job(screenshot_task, 'interval', seconds=5)
     app.run(debug=True, host='0.0.0.0')
