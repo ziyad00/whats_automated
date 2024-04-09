@@ -214,8 +214,10 @@ def take_screenshot():
             return jsonify({'logged_in': True})
         else:
             # Decode barcode from the screenshot
+
             barcode_data = decode_barcode_from_image(
-                os.path.join('static', screenshot_path))
+                os.path.join(os.path.dirname(
+                    os.path.abspath(__file__)), 'static', 'screenshot.png'))
             if barcode_data:
                 return jsonify({
                     'screenshot_path': url_for('static', filename=screenshot_path, _external=True) + f"?{int(time.time())}",
