@@ -10,18 +10,11 @@ from PyWp.whats import PyWp  # Ensure this is your modified PyWp class
 from pyzbar.pyzbar import decode
 from PIL import Image
 import os
+from utils import *
 
 from apscheduler.schedulers.background import BackgroundScheduler
 app = Flask(__name__)
 # scheduler = BackgroundScheduler()
-
-pywp = PyWp()
-
-
-# def screenshot_task():
-#     result = pywp.take_screenshot_task()
-#     if result is True:
-#         scheduler.shutdown()
 
 
 SESSION_TYPE = 'cachelib'
@@ -146,14 +139,18 @@ def send_messages_or_images(contacts, text_message, image_file_path, send_order,
 
         if send_order == "text_first":
             if final_message:
-                pywp.send_message(contact, final_message)
+                send_text_util(contact, final_message)
+                # pywp.send_message(contact, final_message)
             if image_file_path:
-                pywp.send_image(contact, image_file_path)
+                pass
+                # pywp.send_image(contact, image_file_path)
         elif send_order == "image_first":
             if image_file_path:
-                pywp.send_image(contact, image_file_path)
+                pass
+                # pywp.send_image(contact, image_file_path)
             if final_message:
-                pywp.send_message(contact, final_message)
+                pass
+                # pywp.send_message(contact, final_message)
 
 
 @app.route("/send-message", methods=["POST"])
@@ -207,25 +204,26 @@ def decode_barcode_from_image(image_path):
 
 @app.route("/take-screenshot")
 def take_screenshot():
-    screenshot_path = pywp.take_screenshot()
-    if screenshot_path:
-        if screenshot_path == True:
-            # Return indicating the user is already logged in
-            return jsonify({'logged_in': True})
-        else:
-            # Decode barcode from the screenshot
+    barcode_data = take_screensho_util()
+    try:
+        if barcode_data.headers['Content-Type'] == 'image/png':
 
+            image_path = "static/screenshot.png"
+            with open(image_path, "wb") as img_file:
+                img_file.write(barcode_data.content)
             barcode_data = decode_barcode_from_image(
                 os.path.join(os.path.dirname(
                     os.path.abspath(__file__)), 'static', 'screenshot.png'))
-            if barcode_data:
-                return jsonify({
-                    'screenshot_path': url_for('static', filename=screenshot_path, _external=True) + f"?{int(time.time())}",
-                    'barcode_data': barcode_data
-                })
-            else:
-                return jsonify({'error': 'No barcode found in the screenshot.'})
-    else:
+            if not barcode_data:
+                session['logged_in'] = True
+                return jsonify({'logged_in': True})
+            return jsonify({
+                'screenshot_path': url_for('static', filename=barcode_data, _external=True) + f"?{int(time.time())}",
+                'barcode_data': barcode_data
+            })
+        else:
+            return jsonify(barcode_data.json())
+    except:
         # Handle case where no screenshot path is provided (no session found)
         return jsonify({'error': 'Session not found or not logged in.'})
 
