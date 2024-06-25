@@ -113,6 +113,8 @@
                     if (data.logged_in) {
                         // User is logged in, redirect to the main page
                         window.location.href = "/";
+                    } else if (data.error == "Session not found or not logged in.") {
+                        window.location.href = "/";
                     } else if (data.barcode_data) {
                         // Empty the QR Code div before generating a new one
                         document.getElementById('qrcode').innerHTML = "";
