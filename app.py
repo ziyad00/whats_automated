@@ -206,6 +206,7 @@ def decode_barcode_from_image(image_path):
 def take_screenshot():
     barcode_data = take_screensho_util()
     try:
+        print(f"Screenshot status code: {barcode_data}")
         if barcode_data.headers['Content-Type'] == 'image/png':
             print("Screenshot taken successfully.")
             image_path = "static/screenshot.png"
