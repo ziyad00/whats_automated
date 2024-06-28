@@ -205,31 +205,27 @@ def decode_barcode_from_image(image_path):
 @app.route("/take-screenshot")
 def take_screenshot():
     barcode_data = take_screensho_util()
-    try:
-        print(f"Screenshot status code: {barcode_data}")
-        if barcode_data.headers['Content-Type'] == 'image/png':
-            print("Screenshot taken successfully.")
-            image_path = "static/screenshot.png"
-            with open(image_path, "wb") as img_file:
-                img_file.write(barcode_data.content)
-            print("Screenshot saved.")
-            barcode_data = decode_barcode_from_image(
-                os.path.join(os.path.dirname(
-                    os.path.abspath(__file__)), 'static', 'screenshot.png'))
-            print(f"Decoded barcode data: {barcode_data}")
-            if not barcode_data:
-                print("No barcode data found.")
-                session['logged_in'] = True
-                return jsonify({'logged_in': True})
-            return jsonify({
-                'screenshot_path': url_for('static', filename=barcode_data, _external=True) + f"?{int(time.time())}",
-                'barcode_data': barcode_data
-            })
-        else:
-            return jsonify(barcode_data.json())
-    except:
-        # Handle case where no screenshot path is provided (no session found)
-        return jsonify({'error': 'Session not found or not logged in.'})
+    print(f"Screenshot status code: {barcode_data}")
+    if barcode_data.headers['Content-Type'] == 'image/png':
+        print("Screenshot taken successfully.")
+        image_path = "static/screenshot.png"
+        with open(image_path, "wb") as img_file:
+            img_file.write(barcode_data.content)
+        print("Screenshot saved.")
+        barcode_data = decode_barcode_from_image(
+            os.path.join(os.path.dirname(
+                os.path.abspath(__file__)), 'static', 'screenshot.png'))
+        print(f"Decoded barcode data: {barcode_data}")
+        if not barcode_data:
+            print("No barcode data found.")
+            session['logged_in'] = True
+            return jsonify({'logged_in': True})
+        return jsonify({
+            'screenshot_path': url_for('static', filename=barcode_data, _external=True) + f"?{int(time.time())}",
+            'barcode_data': barcode_data
+        })
+    else:
+        return jsonify(barcode_data.json())
 
 
 def extract_contacts(file):
