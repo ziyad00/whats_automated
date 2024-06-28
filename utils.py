@@ -15,6 +15,14 @@ def take_screensho_util():
     return data
 
 
+def logout_util():
+    payload = {"session": "default", "logout": "false"}
+    response = requests.post(
+        f"{url}/api/sessions/stop", data=payload,)
+    data = response
+    return data
+
+
 def create_session():
     payload = {"name": "default"}
     response = requests.post(
