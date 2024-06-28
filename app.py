@@ -208,7 +208,8 @@ def take_screenshot():
     print(f"Screenshot status code: {barcode_data}")
     if barcode_data.headers['Content-Type'] == 'image/png':
         print("Screenshot taken successfully.")
-        image_path = "static/screenshot.png"
+        image_path = os.path.join(os.path.dirname(
+            os.path.abspath(__file__)), 'static', 'screenshot.png')
         with open(image_path, "wb") as img_file:
             img_file.write(barcode_data.content)
         print("Screenshot saved.")
