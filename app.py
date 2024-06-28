@@ -208,19 +208,18 @@ def take_screenshot():
     print(f"Screenshot status code: {barcode_data}")
     if barcode_data.headers['Content-Type'] == 'image/png':
         print("Screenshot taken successfully.")
-        image_path = os.path.join(os.path.dirname(
+        image_path = image_path = os.path.join(os.path.dirname(
             os.path.abspath(__file__)), 'static', 'screenshot.png')
         with open(image_path, "wb") as img_file:
             img_file.write(barcode_data.content)
         print("Screenshot saved.")
         barcode_data = decode_barcode_from_image(
-            os.path.join(os.path.dirname(
-                os.path.abspath(__file__)), 'static', 'screenshot.png'))
+            image_path)
         print(f"Decoded barcode data: {barcode_data}")
         if not barcode_data:
             print("No barcode data found.")
             session['logged_in'] = True
-            return jsonify({'logged_in': True})
+            return jsonify({'logged_in': False})
         return jsonify({
             'screenshot_path': url_for('static', filename=barcode_data, _external=True) + f"?{int(time.time())}",
             'barcode_data': barcode_data
