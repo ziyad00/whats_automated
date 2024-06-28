@@ -3,7 +3,6 @@ import requests
 
 
 def take_screensho_util():
-    # headers = {"accept": "application/json"}
     payload = {"session": "default", "format": "image"}
     response = requests.get(
         f"{url}/api/screenshot", params=payload,)
@@ -11,7 +10,7 @@ def take_screensho_util():
     if data.status_code == 500 or data.status_code == 404:
         create_session()
         response = requests.get(
-            f"{url}/api/screenshot", params=payload,)
+            f"{url}/api/default/auth/qr", params=payload,)
         data = response
     return data
 
